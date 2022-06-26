@@ -132,7 +132,7 @@ class XmlTemplate
         );
 
         // Break the template into lines
-        $tplLines = explode("\n", $rawTemplate);
+        $tplLines = split("\n", $rawTemplate);
 
         // Browse the lines looking for section headers like ">>SECTION_HEADER_NAME"
         for ( $i=0; $i<count($tplLines); $i++ )

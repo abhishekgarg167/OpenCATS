@@ -1,12 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-if( !defined('LEGACY_ROOT') )
-{
-    define('LEGACY_ROOT', '.');
-}
-
-include_once(LEGACY_ROOT . '/lib/VCard.php');
+include_once('./lib/VCard.php');
 
 class VCardTest extends TestCase
 {

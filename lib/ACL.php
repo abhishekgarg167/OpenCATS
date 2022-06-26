@@ -17,6 +17,7 @@ class ACL
     const SECOBJ_ROOT = '';
     const CATEGORY_EMPTY = '';
 
+
     /* Access level map in form securedObject => category => accessLevel
      * Example:
     const CATEGORY_DISABLED = '#';
@@ -51,16 +52,20 @@ class ACL
     */
     public static function getAccessLevel($securedObjectName, $userCategories, $defaultAccessLevel)
     {
+
         if( !class_exists('ACL_SETUP') || empty(ACL_SETUP::$ACCESS_LEVEL_MAP))
         {
+            error_log("acl_setup doesn't exist" . $defaultAccessLevel);
             return $defaultAccessLevel;
         }
 
         $aclmap = ACL_SETUP::$ACCESS_LEVEL_MAP;
+
         $userCategory = ACL::CATEGORY_EMPTY;
+        //$userCategory = ACL_SETUP::'demo';
         if( isset($userCategories) && count($userCategories) > 0 && isset($userCategories[0]) )
         {
-            // for now, only first category is used for evalualtion
+            // for now, only first category is used for evaluation
             $userCategory = $userCategories[0];
         }
         if( ACL::_hasACLEntry($aclmap, $userCategory, $securedObjectName))
@@ -71,6 +76,7 @@ class ACL
         while(($pos = strrpos($securedObjectName, ".")) !== false)
         {
             $securedObjectName = substr($securedObjectName, 0, $pos);
+
             if( ACL::_hasACLEntry($aclmap, $userCategory, $securedObjectName))
             {
                 return $aclmap[$userCategory][$securedObjectName];
@@ -84,7 +90,8 @@ class ACL
     }
 
     public static function _hasACLEntry($aclmap, $userCategory, $securedObjectName)
-    { 
+    {
+
         return array_key_exists($userCategory, $aclmap)
             && array_key_exists($securedObjectName, $aclmap[$userCategory])
             && NULL !== $aclmap[$userCategory][$securedObjectName];

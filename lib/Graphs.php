@@ -33,7 +33,7 @@
 /**
  * Statistics library.
  */
-include_once(LEGACY_ROOT . '/lib/Statistics.php');
+include_once('./lib/Statistics.php');
 
 /**
  *	Graph Interface Library

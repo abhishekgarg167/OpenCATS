@@ -3,7 +3,7 @@
  * CATS
  * Contacts Datagrid
  *
- * CATS Version: 0.9.6
+ * CATS Version: 0.9.4 Countach
  *
  * Copyright (C) 2005 - 2007 Cognizo Technologies, Inc.
  *
@@ -31,10 +31,10 @@
  * $Id: dataGrids.php 3566 2007-11-12 09:46:35Z will $
  */
  
-include_once(LEGACY_ROOT . '/lib/ActivityEntries.php');
-include_once(LEGACY_ROOT . '/lib/Hooks.php');
-include_once(LEGACY_ROOT . '/lib/InfoString.php');
-include_once(LEGACY_ROOT . '/lib/Width.php');
+include_once('./lib/ActivityEntries.php');
+include_once('./lib/Hooks.php');
+include_once('./lib/InfoString.php');
+include_once('./lib/Width.php');
 
 class ActivityDataGrid extends DataGrid
 {

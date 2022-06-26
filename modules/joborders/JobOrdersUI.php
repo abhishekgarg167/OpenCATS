@@ -27,26 +27,25 @@
  * $Id: JobOrdersUI.php 3810 2007-12-05 19:13:25Z brian $
  */
 
-include_once(LEGACY_ROOT . '/lib/StringUtility.php');
-include_once(LEGACY_ROOT . '/lib/ResultSetUtility.php');
-include_once(LEGACY_ROOT . '/lib/DateUtility.php'); /* Depends on StringUtility. */
-include_once(LEGACY_ROOT . '/lib/JobOrders.php');
-include_once(LEGACY_ROOT . '/lib/Pipelines.php');
-include_once(LEGACY_ROOT . '/lib/Attachments.php');
-include_once(LEGACY_ROOT . '/lib/Companies.php');
-include_once(LEGACY_ROOT . '/lib/Candidates.php');
-include_once(LEGACY_ROOT . '/lib/ActivityEntries.php');
-include_once(LEGACY_ROOT . '/lib/Export.php');
-include_once(LEGACY_ROOT . '/lib/InfoString.php');
-include_once(LEGACY_ROOT . '/lib/EmailTemplates.php');
-include_once(LEGACY_ROOT . '/lib/FileUtility.php');
-include_once(LEGACY_ROOT . '/lib/CareerPortal.php');
-include_once(LEGACY_ROOT . '/lib/ExtraFields.php');
-include_once(LEGACY_ROOT . '/lib/Graphs.php');
-include_once(LEGACY_ROOT . '/lib/Questionnaire.php');
-include_once(LEGACY_ROOT . '/lib/CommonErrors.php');
-include_once(LEGACY_ROOT . '/lib/JobOrderTypes.php');
-include_once(LEGACY_ROOT . '/lib/JobOrderStatuses.php');
+include_once('./lib/StringUtility.php');
+include_once('./lib/ResultSetUtility.php');
+include_once('./lib/DateUtility.php'); /* Depends on StringUtility. */
+include_once('./lib/JobOrders.php');
+include_once('./lib/Pipelines.php');
+include_once('./lib/Attachments.php');
+include_once('./lib/Companies.php');
+include_once('./lib/Candidates.php');
+include_once('./lib/ActivityEntries.php');
+include_once('./lib/Export.php');
+include_once('./lib/InfoString.php');
+include_once('./lib/EmailTemplates.php');
+include_once('./lib/FileUtility.php');
+include_once('./lib/CareerPortal.php');
+include_once('./lib/ExtraFields.php');
+include_once('./lib/Graphs.php');
+include_once('./lib/Questionnaire.php');
+include_once('./lib/CommonErrors.php');
+include_once('./lib/JobOrderTypes.php');
 
 
 class JobOrdersUI extends UserInterface
@@ -93,6 +92,8 @@ class JobOrdersUI extends UserInterface
     {
         $action = $this->getAction();
 
+        // CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, $this->getUserAccessLevel('joborders.show') . "hh"  .  $_SESSION['CATS']->getAccessLevel(ACL::SECOBJ_ROOT)   . $action );
+
         if (!eval(Hooks::get('JO_HANDLE_REQUEST'))) return;
 
         switch ($action)
@@ -100,6 +101,7 @@ class JobOrdersUI extends UserInterface
             case 'show':
                 if ($this->getUserAccessLevel('joborders.show') < ACCESS_LEVEL_READ)
                 {
+                    //error_log('ab');
                     CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
                 }
                 $this->show();
@@ -116,6 +118,7 @@ class JobOrdersUI extends UserInterface
             case 'add':
                 if ($this->getUserAccessLevel('joborders.add') < ACCESS_LEVEL_EDIT)
                 {
+
                     CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
                 }
                 if ($this->isPostBack())
@@ -130,6 +133,7 @@ class JobOrdersUI extends UserInterface
                 break;
 
             case 'edit':
+
                 if ($this->getUserAccessLevel('joborders.edit') < ACCESS_LEVEL_EDIT)
                 {
                     CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
@@ -158,7 +162,7 @@ class JobOrdersUI extends UserInterface
                 {
                     CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
                 }
-                include_once(LEGACY_ROOT . '/lib/Search.php');
+                include_once('./lib/Search.php');
 
                 if ($this->isGetBack())
                 {
@@ -197,7 +201,7 @@ class JobOrdersUI extends UserInterface
                 {
                     CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
                 }
-                include_once(LEGACY_ROOT . '/lib/Search.php');
+                include_once('./lib/Search.php');
 
                 if ($this->isPostBack())
                 {
@@ -257,7 +261,7 @@ class JobOrdersUI extends UserInterface
                     CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
                 }
 
-                include_once(LEGACY_ROOT . '/lib/DocumentToText.php');
+                include_once('./lib/DocumentToText.php');
 
                 if ($this->isPostBack())
                 {
@@ -315,8 +319,6 @@ class JobOrdersUI extends UserInterface
      */
     private function listByView($errMessage = '')
     {
-        $jobOrderFilters = JobOrderStatuses::getFilters();
-
         $dataGridProperties = DataGrid::getRecentParamaters("joborders:JobOrdersListByViewDataGrid");
 
         /* If this is the first time we visited the datagrid this session, the recent paramaters will
@@ -325,7 +327,7 @@ class JobOrdersUI extends UserInterface
         {
             $dataGridProperties = array('rangeStart'    => 0,
                                         'maxResults'    => 50,
-                                        'filter'        => 'Status=='.$jobOrderFilters[0],
+                                        'filter'        => 'Status==Active / OnHold / Full',
                                         'filterVisible' => false);
         }
 
@@ -335,7 +337,6 @@ class JobOrdersUI extends UserInterface
         $this->_template->assign('dataGrid', $dataGrid);
         $this->_template->assign('userID', $_SESSION['CATS']->getUserID());
         $this->_template->assign('errMessage', $errMessage);
-        $this->_template->assign('jobOrderFilters', $jobOrderFilters);
 
         if (!eval(Hooks::get('JO_LIST_BY_VIEW'))) return;
 
@@ -535,7 +536,7 @@ class JobOrdersUI extends UserInterface
     {
         $jobOrders = new JobOrders($this->_siteID);
 
-        $rs = $jobOrders->getAll(JOBORDERS_STATUS_ALL);
+        $rs = $jobOrders->getAll(JOBORDERS_STATUS_ACTIVEONHOLDFULL);
 
         $this->_template->assign('isModal', true);
         $this->_template->assign('rs', $rs);
@@ -714,7 +715,7 @@ class JobOrdersUI extends UserInterface
 
         if (isset($_POST['openings']) && !empty($_POST['openings']) &&
             !ctype_digit((string) trim($_POST['openings'])))
-        {        	
+        {
             CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, 'Invalid number of openings.');
         }
 
@@ -936,7 +937,6 @@ class JobOrdersUI extends UserInterface
         $this->_template->assign('isHrMode', $_SESSION['CATS']->isHrMode());
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
         $this->_template->assign('jobTypes', (new JobOrderTypes())->getAll());
-        $this->_template->assign('jobOrderStatuses', (JobOrderStatuses::getAll()));
 
         if (!eval(Hooks::get('JO_EDIT'))) return;
 
@@ -1169,7 +1169,7 @@ class JobOrdersUI extends UserInterface
 
     /*
      * Called by handleRequest() to handle loading the "Add candidate to this
-     * Job Order" initial search page in the modal dialog.
+     * Job Order Pipeline" initial search page in the modal dialog.
      */
     private function considerCandidateSearch()
     {
@@ -1191,7 +1191,7 @@ class JobOrdersUI extends UserInterface
 
     /*
      * Called by handleRequest() to handle processing an "Add candidate to
-     * this Job Order" search and displaying the results in the
+     * this Job Order Pipeline" search and displaying the results in the
      * modal dialog.
      */
     private function onConsiderCandidateSearch()
@@ -1290,7 +1290,7 @@ class JobOrdersUI extends UserInterface
         $pipelines = new Pipelines($this->_siteID);
         if (!$pipelines->add($candidateID, $jobOrderID, $this->_userID))
         {
-            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, 'Failed to add candidate to job order.');
+            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, 'Failed to add candidate to pipeline.');
         }
 
         $activityEntries = new ActivityEntries($this->_siteID);
@@ -1298,7 +1298,7 @@ class JobOrdersUI extends UserInterface
             $candidateID,
             DATA_ITEM_CANDIDATE,
             400,
-            'Added candidate to job order.',
+            'Added candidate to pipeline.',
             $this->_userID,
             $jobOrderID
         );
@@ -1403,7 +1403,7 @@ class JobOrdersUI extends UserInterface
 
         if (!eval(Hooks::get('JO_ON_ADD_CANDIDATE_MODAL'))) return;
 
-        include_once(LEGACY_ROOT . '/modules/candidates/CandidatesUI.php');
+        include_once('./modules/candidates/CandidatesUI.php');
         $candidatesUI = new CandidatesUI();
 
         if (is_array($mp = $candidatesUI->checkParsingFunctions()))
@@ -1547,7 +1547,7 @@ class JobOrdersUI extends UserInterface
 
         if (!eval(Hooks::get('JO_ON_ADD_ACTIVITY_CHANGE_STATUS'))) return;
 
-        include_once(LEGACY_ROOT . '/modules/candidates/CandidatesUI.php');
+        include_once('./modules/candidates/CandidatesUI.php');
         $candidatesUI = new CandidatesUI();
         $candidatesUI->publicAddActivityChangeStatus(
             true, $regardingID, $this->_moduleDirectory

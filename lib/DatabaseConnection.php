@@ -108,14 +108,12 @@ class DatabaseConnection
      */
     public function connect()
     {
-        $this->_connection = @mysqli_connect(
+        $this->_connection = @mysql_connect(
             DATABASE_HOST, DATABASE_USER, DATABASE_PASS
         );
-        // handle connection failures
         if (!$this->_connection)
         {
-            $error = "errno: " . mysqli_connect_errno() . ", ";
-            $error .= "error: " . mysqli_connect_error();
+            $error = mysql_error();
 
             die(
                 '<!-- NOSPACEFILTER --><p style="background: #ec3737; padding:'
@@ -125,12 +123,11 @@ class DatabaseConnection
             );
             return false;
         }
-        mysqli_set_charset($this->_connection, SQL_CHARACTER_SET);
-        $isDBSelected = @mysqli_select_db($this->_connection, DATABASE_NAME);
+        mysql_set_charset(SQL_CHARACTER_SET, $this->_connection);
+        $isDBSelected = @mysql_select_db(DATABASE_NAME, $this->_connection);
         if (!$isDBSelected)
         {
-            $error = "errno: " . mysqli_connect_errno() . ", ";
-            $error .= "error: " . mysqli_connect_error();
+            $error = mysql_error($this->_connection);
 
             die(
                 '<!-- NOSPACEFILTER --><p style="background: #ec3737; '
@@ -170,35 +167,18 @@ class DatabaseConnection
 
         if( ini_get('safe_mode') )
         {
-    			//don't do anything in safe mode
-    		}
-    		else
+			//don't do anything in safe mode
+		}
+		else
         {
             /* Don't limit the execution time of queries. */
             set_time_limit(0);
         }
 
-        $this->_queryResult = mysqli_query($this->_connection, $query);
-
-        // handle connection failures
-        if (isset($this->_queryResult->connect_errno)) {
-            $error = "errno: " . $this->_queryResult->connect_errno . ", ";
-            $error .= "error: " . $this->_queryResult->connect_error;
-
-            die (
-                '<!-- NOSPACEFILTER --><p style="background: #ec3737; padding:'
-                . ' 4px; margin-top: 0; font: normal normal bold 12px/130%'
-                . ' Arial, Tahoma, sans-serif;">Query Error -- Report to System'
-                . " Administrator ASAP</p><pre>\n\nMySQL Query Failed: "
-                . $error . "\n\n" . $query . "</pre>\n\n"
-            );
-            return false;
-        }
-
-        if (!$this->_queryResult && isset($this->_queryResult->connect_errno) && !$ignoreErrors)
+        $this->_queryResult = mysql_query($query, $this->_connection);
+        if (!$this->_queryResult && !$ignoreErrors)
         {
-            $error = "errno: " . $this->_queryResult->connect_errno . ", ";
-            $error .= "error: " . $this->_queryResult->connect_error;
+            $error = mysql_error($this->_connection);
 
             echo (
                 '<!-- NOSPACEFILTER --><p style="background: #ec3737; padding:'
@@ -266,7 +246,7 @@ class DatabaseConnection
             $this->query($query);
         }
 
-        $numRows = mysqli_num_rows($this->_queryResult);
+        $numRows = mysql_num_rows($this->_queryResult);
         if ($numRows === false)
         {
             return false;
@@ -280,8 +260,7 @@ class DatabaseConnection
             return false;
         }
 
-		mysqli_data_seek($this->_queryResult, $row);
-        return mysqli_fetch_row($this->_queryResult);
+        return mysql_result($this->_queryResult, $row, $column);
     }
 
     /**
@@ -318,7 +297,7 @@ class DatabaseConnection
             $this->query($query);
         }
 
-        $recordSet = mysqli_fetch_assoc($this->_queryResult);
+        $recordSet = mysql_fetch_assoc($this->_queryResult);
 
         if (empty($recordSet))
         {
@@ -362,14 +341,11 @@ class DatabaseConnection
 
         /* Make sure we always return an array. */
         $recordSetArray = array();
-        
-        if($this->_queryResult)
+
+        /* Store all rows in $recordSetArray; */
+        while (($recordSet = mysql_fetch_assoc($this->_queryResult)))
         {
-            /* Store all rows in $recordSetArray; */
-            while (($recordSet = mysqli_fetch_assoc($this->_queryResult)))
-            {
-                $recordSetArray[] = $recordSet;
-            }
+            $recordSetArray[] = $recordSet;
         }
 
         /* Return the multi-dimensional record set array. */
@@ -389,7 +365,7 @@ class DatabaseConnection
             $this->query($query);
         }
 
-        return mysqli_num_rows($this->_queryResult);
+        return mysql_num_rows($this->_queryResult);
     }
 
     /**
@@ -400,7 +376,7 @@ class DatabaseConnection
      */
     public function isEOF()
     {
-        $rowCount = mysqli_num_rows($this->_queryResult);
+        $rowCount = mysql_num_rows($this->_queryResult);
         if (!$rowCount)
         {
             return true;
@@ -480,10 +456,10 @@ class DatabaseConnection
     public function escapeString($string)
     {
         // FIXME: Security issue, this function is not enough for sanitizing
-        // user input. For instance see:
+        // user input. For instance see: 
         // https://johnroach.info/2011/02/17/why-mysql_real_escape_string-isnt-enough-to-stop-sql-injection-attacks/
         // To be replaced with Symfony's stack
-        return mysqli_real_escape_string($this->_connection, $string);
+        return mysql_real_escape_string($string, $this->_connection);
     }
 
     /**
@@ -582,9 +558,7 @@ class DatabaseConnection
      */
     public function getError()
     {
-        $error = "errno: " . mysqli_connect_errno() . ", ";
-        $error .= "error: " . mysqli_connect_error();
-        return $error;
+        return mysql_error($this->_connection);
     }
 
     /**
@@ -598,7 +572,7 @@ class DatabaseConnection
      */
     public function getLastInsertID()
     {
-        return @mysqli_insert_id($this->_connection);
+        return @mysql_insert_id($this->_connection);
     }
 
     /**
@@ -610,7 +584,7 @@ class DatabaseConnection
      */
     public function getAffectedRows()
     {
-        return @mysqli_affected_rows($this->_connection);
+        return @mysql_affected_rows($this->_connection);
     }
 
     /**

@@ -49,17 +49,17 @@ $dataItemID   = $_REQUEST['dataItemID'];
 switch ($dataItemType)
 {
     case DATA_ITEM_CANDIDATE:
-        include_once(LEGACY_ROOT . '/lib/Candidates.php');
+        include_once('./lib/Candidates.php');
         $dataItem = new Candidates($siteID);
         break;
 
     case DATA_ITEM_COMPANY:
-        include_once(LEGACY_ROOT . '/lib/Companies.php');
+        include_once('./lib/Companies.php');
         $dataItem = new Companies($siteID);
         break;
 
     case DATA_ITEM_CONTACT:
-        include_once(LEGACY_ROOT . '/lib/Contacts.php');
+        include_once('./lib/Contacts.php');
         $dataItem = new Contacts($siteID);
         break;
 

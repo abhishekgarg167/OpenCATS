@@ -79,10 +79,11 @@ function dumpDB($db, $file, $useStatus = false, $splitFiles = true, $siteID = -1
 
     $text = '';
 
-    $result = mysqli_query($connection,
-        sprintf("SHOW TABLES FROM `%s`", DATABASE_NAME)
+    $result = mysql_query(
+        sprintf("SHOW TABLES FROM `%s`", DATABASE_NAME),
+        $connection
     );
-    while ($row = mysqli_fetch_array($result, MYSQLI_NUM))
+    while ($row = mysql_fetch_array($result, MYSQL_NUM))
     {
         $tables[] = $row[0];
     }
@@ -107,10 +108,10 @@ function dumpDB($db, $file, $useStatus = false, $splitFiles = true, $siteID = -1
 
         $text .= 'DROP TABLE IF EXISTS `' . $table . '`((ENDOFQUERY))'."\n";
         $sql = 'SHOW CREATE TABLE ' . $table;
-        $rs = mysqli_query($connection, $sql);
+        $rs = mysql_query($sql, $connection);
         if ($rs)
         {
-            if ($row = mysqli_fetch_assoc($rs))
+            if ($row = mysql_fetch_assoc($rs))
             {
                 $text .= $row['Create Table'] . "((ENDOFQUERY))\n\n";
             }
@@ -131,8 +132,8 @@ function dumpDB($db, $file, $useStatus = false, $splitFiles = true, $siteID = -1
 
         $isSiteIdColumn = false;
         $sql = sprintf("SHOW COLUMNS FROM %s", $table);
-        $rs = mysqli_query($connection, $sql);
-        while ($recordSet = mysqli_fetch_assoc($rs))    
+        $rs = mysql_query($sql, $connection);
+        while ($recordSet = mysql_fetch_assoc($rs))    
         {
             if ($recordSet['Field'] == 'site_id')
             {
@@ -149,9 +150,9 @@ function dumpDB($db, $file, $useStatus = false, $splitFiles = true, $siteID = -1
             $sql = 'SELECT * FROM ' . $table . '';
         }
 
-        $rs = mysqli_query($sql, $connection);
+        $rs = mysql_query($sql, $connection);
         $index = 0;
-        while ($recordSet = mysqli_fetch_assoc($rs))
+        while ($recordSet = mysql_fetch_assoc($rs))
         {
             $continue = true;
 
@@ -227,7 +228,7 @@ function dumpDB($db, $file, $useStatus = false, $splitFiles = true, $siteID = -1
                 $i = 0;
                 foreach ($recordSet as $field)
                 {
-                    $text .= "'".mysqli_real_escape_string($connection, $field)."'";
+                    $text .= "'".mysql_real_escape_string($field)."'";
                     $i++;
                     if ($i != count($recordSet))
                     {

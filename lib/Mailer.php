@@ -3,6 +3,8 @@
  * CATS
  * Mail Transfer Library
  *
+ * Copyright (C) 2005 - 2007 Cognizo Technologies, Inc.
+ *
  *
  * The contents of this file are subject to the CATS Public License
  * Version 1.1a (the "License"); you may not use this file except in
@@ -34,24 +36,20 @@
  *	@subpackage Library
  */
 
- // Import PHPMailer classes into the global namespace
- // These must be at the top of your script, not inside a function
- use PHPMailer\PHPMailer\PHPMailer;
- use PHPMailer\PHPMailer\Exception;
-
- // Load Composer's autoloader
- require './vendor/autoload.php';
+/* E_STRICT doesn't like PHPMailer. */
+$errorReporting = error_reporting();
+error_reporting($errorReporting & ~ E_STRICT);
+require './lib/phpmailer/PHPMailerAutoload.php';
+error_reporting($errorReporting);
 
 // FIXME: Remove this dependency! Bad bad bad!
-include_once(LEGACY_ROOT . '/lib/Pipelines.php');
+include_once('./lib/Pipelines.php');
 
 define('MAILER_MODE_DISABLED', 0);
 define('MAILER_MODE_PHP',      1);
 define('MAILER_MODE_SENDMAIL', 2);
 define('MAILER_MODE_SMTP',     3);
 
-$errorReporting = error_reporting();
-error_reporting($errorReporting & ~ E_STRICT);
 
 /**
  *	E-Mail Abstraction Layer
@@ -72,8 +70,8 @@ class Mailer
     {
         $this->_siteID = $siteID;
 
-        // Instantiation and passing `true` enables exceptions
-        $this->_mailer = new PHPMailer(true);
+        $this->_mailer = new PHPMailer();
+        $this->_mailer->PluginDir = './lib/phpmailer/';
 
         /* Load mailer configuration settings. */
         $settings = new MailerSettings($this->_siteID);
@@ -208,8 +206,8 @@ class Mailer
 
             if ($signature)
             {
-                $body .= '\n<br />\n<br /><span style=\"font-size: 10pt;\">Powered by <a href=\"http://www.opencats.org" alt=\"OpenCATS "
-                    . "Applicant Tracking System\">OpenCATS</a> (Free ATS)</span>';
+                $body .= "\n<br />\n<br /><span style=\"font-size: 10pt;\">Powered by <a href=\"http://www.catsone.com\" alt=\"CATS "
+                    . "Applicant Tracking System\">CATS</a> (Free ATS)</span>";
             }
 
             $this->_mailer->Body = '<div style="font: normal normal 12px Arial, Tahoma, sans-serif">'
@@ -221,7 +219,7 @@ class Mailer
         {
             if ($signature)
             {
-                $body .= "\n\nPowered by OpenCATS (http://www.opencats.org) Free ATS";
+                $body .= "\n\nPowered by CATS (http://www.catsone.com) Free ATS";
             }
 
             $this->_mailer->isHTML(false);
@@ -237,7 +235,7 @@ class Mailer
             {
                 $this->_mailer->AddReplyTo($replyTo[0], $replyTo[1]);
             }
-            $this->_mailer->CharSet = 'UTF-8';
+
             if (!$this->_mailer->Send())
             {
                 $failedRecipients[] = array(
@@ -317,12 +315,12 @@ class Mailer
                 break;
 
             case MAILER_MODE_SENDMAIL:
-                $this->_mailer->isSendmail();
+                $this->_mailer->Mailer   = 'sendmail';
                 $this->_mailer->Sendmail = MAIL_SENDMAIL_PATH;
                 break;
 
             case MAILER_MODE_SMTP:
-                $this->_mailer->isSMTP();
+                $this->_mailer->Mailer = 'smtp';
                 $this->_mailer->Host   = MAIL_SMTP_HOST;
                 $this->_mailer->Port   = MAIL_SMTP_PORT;
                 $this->_mailer->SMTPSecure  = MAIL_SMTP_SECURE;
@@ -346,7 +344,7 @@ class Mailer
 
             case MAILER_MODE_PHP:
             default:
-                $this->_mailer->isMail();
+                $this->_mailer->Mailer = 'mail';
                 break;
         }
     }
@@ -387,7 +385,7 @@ class Mailer
             $this->_userID,
             $this->_siteID
          );
-
+         
          $this->_db->query($sql);
     }
 }
@@ -417,7 +415,7 @@ class MailerSettings
     public function getAll()
     {
         // FIXME: This is violating just about every OO design principal I can come up with :)
-
+        
         /* Default values. */
         $pipelines = new Pipelines($this->_siteID);
         $statuses = $pipelines->getStatuses();

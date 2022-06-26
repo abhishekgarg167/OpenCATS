@@ -58,6 +58,11 @@ class ParseUtility
     public function startClient()
     {
         $this->_client = new SoapClient($this->_wsdl);
+        // $options = array(
+        //     'location' => 'wsdl/parse.wsdl',
+        //     'uri' => 'wsdl/parse.wsdl'
+        //     );
+        //     $this->_client = new SoapClient(NULL, $options);
     }
 
     /**

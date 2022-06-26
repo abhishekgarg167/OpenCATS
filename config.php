@@ -30,12 +30,6 @@
 /* License key. */
 define('LICENSE_KEY','3163GQ-54ISGW-14E4SHD-ES9ICL-X02DTG-GYRSQ6');
 
-/* legacy root. */
-if( !defined('LEGACY_ROOT') )
-{
-    define('LEGACY_ROOT', '.');
-}
-
 /* Database configuration. */
 define('DATABASE_USER', 'opencats');
 define('DATABASE_PASS', 'opencats');
@@ -59,14 +53,14 @@ define('SSL_ENABLED', false);
  * 'C:\\antiword\\antiword.exe'. Windows Antiword will have problems locating
  * mapping files if you install it anywhere but C:\antiword\.
  */
-define('ANTIWORD_PATH', "\\path\\to\\antiword");
+define('ANTIWORD_PATH', "C:\\tools\\pdftotext\\pdftotext.exe");
 define('ANTIWORD_MAP', '8859-1.txt');
 
 /* XPDF / pdftotext settings. Remember to use double backslashes (\) to represent
  * one backslash (\).
  * http://www.foolabs.com/xpdf/
  */
-define('PDFTOTEXT_PATH', "\\path\\to\\pdftotext");
+define('PDFTOTEXT_PATH', "C:\\tools\\pdftotext\\pdftotext.exe");
 
 /* html2text settings. Remember to use double backslashes (\) to represent
  * one backslash (\). 'html2text' can be found at:
@@ -177,7 +171,7 @@ define('FORGOT_PASSWORD_BODY',      'You recently requested that your OpenCATS: 
 define('ENABLE_DEMO_MODE', false);
 
 /* Offset to GMT Time. */
-define('OFFSET_GMT', 6);
+define('OFFSET_GMT', -5);
 
 /* Should we enforce only one session per user (excluding demo)? */
 define('ENABLE_SINGLE_SESSION', false);
@@ -272,7 +266,7 @@ define ('LDAP_BASEDN', 'dc=example,dc=com');
 define ('LDAP_BIND_DN', 'cn=read-only-admin,dc=example,dc=com');
 define ('LDAP_BIND_PASSWORD', 'password');
 
-define ('LDAP_ACCOUNT', 'cn={$username},dc=example,dc=com'); // '{$username}' cannot be changed, else can
+define ('LDAP_ACCOUNT', '{$username}'); // '{$username}' cannot be changed, else can
 
 define ('LDAP_ATTRIBUTE_UID', 'uid');
 define ('LDAP_ATTRIBUTE_DN', 'dn');
@@ -281,54 +275,12 @@ define ('LDAP_ATTRIBUTE_FIRSTNAME', 'givenname');
 define ('LDAP_ATTRIBUTE_EMAIL', 'mail');
 
 define ('LDAP_SITEID', 1);
-define ('LDAP_AD', false); // use for AD and Samba LDAP servers
 
-/* Encodings available during Data Import */
-/*const IMPORT_FILE_ENCODING = array(
-    'ISO-8859-1', 'GB2312', 'Windows-1251', 'Windows-1252', 'Shift JIS',
-'GBK', 'Windows-1256', 'ISO-8859-2', 'EUC-JP', 'ISO-8859-15', 'ISO-8859-9', 'Windows-1250',
-'Windows-1254', 'EUC-KR', 'Big5', 'Windows-874', 'US-ASCII', 'TIS-620', 'ISO-8859-7', 'Windows-1255'
-);*/
-
-/* Job Order statuses (not pipeline statuses) defined in groups */
-/* Uncomment and correct bellow if you want different statuses */
-/*const JOB_ORDER_STATUS_GROUP = array(
-    'Open' => array ('Active', 'On Hold', 'Full'),
-    'Closed' => array('Closed', 'Canceled'),
-    'Pre-Open' => array('Upcoming', 'Lead')
-);*/
-
-/* Job order status(es) used for XML, RSS and Careers portal */
-/* Uncomment and correct bellow if you want different statuses to be included */
-/*const JOB_ORDER_STATUS_SHARING = array(
-    'Active'
-);*/
-
-/* Filters that can be used on main job order grid, the first one will be default selected */
-/* Uncomment and correct bellow if you want different combination of statuses */
-/*const JOB_ORDER_STATUS_FILTERING = array(
-    'Active / On Hold / Full',
-    'Active',
-    'On Hold / Full',
-    'Closed / Canceled',
-    'Upcoming / Lead'
-);*/
-
-/* Job order status(es) used for submission/placement statistics */
-/* Uncomment and correct bellow if you want different combination of statistics */
-/*const JOB_ORDER_STATUS_STATISTICS = array(
-    'Active', 'On Hold', 'Full', 'Closed'
-);*/
-
-/* Job Order Default status after creation */
-/* Uncomment and correct bellow if you want different default status */
-/*const JOB_ORDER_STATUS_DEFAULT = 'Active';*/
 
 /* Job Types mapping
- *
- * Uncomment bellow if you want custom mapping */
-
- /*
+ */
+/* Uncomment bellow if you want custom mapping */
+/*
 class JOB_TYPES {
     public static $LIST = array(
         'PT' => 'Part-Time',
@@ -340,8 +292,8 @@ class JOB_TYPES {
 */
 
 
-/*
-require_once(LEGACY_ROOT . '/constants.php');
+
+require_once('./constants.php');
 
 class ACL_SETUP {
 
@@ -355,17 +307,27 @@ class ACL_SETUP {
     public static $ACCESS_LEVEL_MAP = array(
         'candidate' => array(
         ),
+        'recruiter' => array(
+                 'candidates' => ACCESS_LEVEL_DELETE,
+                 'joborders' => ACCESS_LEVEL_DISABLED,
+                 'companies' => ACCESS_LEVEL_DISABLED,
+                 'calendar' => ACCESS_LEVEL_DISABLED,
+                 'reports' => ACCESS_LEVEL_DISABLED,
+                 'contacts' => ACCESS_LEVEL_DISABLED,
+                 'lists' => ACCESS_LEVEL_DISABLED,
+                 'settings' => ACCESS_LEVEL_DISABLED,
+        ),
         'demo' => array(
             'candidates' => ACCESS_LEVEL_DELETE,
             'candidates.emailCandidates' => ACCESS_LEVEL_DISABLED,
             'candidates.history' => ACCESS_LEVEL_DEMO,
-            'joborders' => ACCESS_LEVEL_DELETE,
-            'joborders.show' => ACCESS_LEVEL_DEMO,
+            'joborders' => ACCESS_LEVEL_DISABLED,
+            'joborders.show' => ACCESS_LEVEL_DISABLED,
             'joborders.email' => ACCESS_LEVEL_DISABLED,
         )
     );
 };
-*/
+
 
 /* All possible secure object names
             'candidates.history'
@@ -490,7 +452,6 @@ class ACL_SETUP {
             'candidates.emailCandidates'
             'candidates.show_questionnaire'
             'candidates.list'
-            'candidates.duplicates'
             'calendar.show'
             'calendar.addEvent'
             'calendar.editEvent'

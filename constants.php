@@ -41,12 +41,10 @@ $coreModules = array(
 );
 
 /* CATS Version */
-
-define('CATS_VERSION', '0.9.6');
-
+define('CATS_VERSION', '0.9.4 Countach');
 
 /* Copyright information at bottom of pages. */
-define('COPYRIGHT_HTML', '&copy; 2007-2020 OpenCATS.');
+define('COPYRIGHT_HTML', '&copy; 2005 - 2007 Cognizo Technologies, Inc.');
 
 /* HTTP response codes. */
 define('HTTP_OK',             200);
@@ -62,7 +60,6 @@ define('DATA_ITEM_BULKRESUME',  500);
 define('DATA_ITEM_USER',        600);
 define('DATA_ITEM_LIST',        700);
 define('DATA_ITEM_PIPELINE',    800);
-define('DATA_ITEM_DUPLICATE',   900);
 
 /* Settings types. */
 define('SETTINGS_MAILER',        1);

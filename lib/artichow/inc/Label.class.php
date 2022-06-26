@@ -217,7 +217,7 @@ class awLabel implements awPositionable {
 	 * @param string $function
 	 */
 	public function setCallbackFunction($function) {
-	    $this->function = $function;
+		$this->function = is_null($function) ? $function : (string)$function;
 	}
 
 	/**
@@ -235,9 +235,11 @@ class awLabel implements awPositionable {
 	 * @param string $format New format (printf style: %.2f for example)
 	 */
 	public function setFormat($format) {
-		$this->setCallbackFunction(function ($value) use ($format) {
-		    return sprintf($format, $value);
-		});
+		$function = 'label'.time().'_'.(microtime() * 1000000);
+		eval('function '.$function.'($value) {
+			return sprintf("'.addcslashes($format, '"').'", $value);
+		}');
+		$this->setCallbackFunction($function);
 	}
 
 	/**
@@ -496,7 +498,7 @@ class awLabel implements awPositionable {
 		}
 
 		// Hide last label
-		if(is_array($this->texts) && $key === count($this->texts) - 1 and $this->hideLast) {
+		if($key === count($this->texts) - 1 and $this->hideLast) {
 			return;
 		}
 

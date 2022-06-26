@@ -30,8 +30,7 @@
  * @version    $Id: Statistics.php 3587 2007-11-13 03:55:57Z will $
  */
 
-include_once(LEGACY_ROOT . '/lib/Pipelines.php');
-include_once(LEGACY_ROOT . '/lib/JobOrderStatuses.php');
+include_once('./lib/Pipelines.php');
 
 /**
  *	Statistics Library
@@ -101,11 +100,10 @@ class Statistics
             WHERE
                 status_to = 400
             AND
-                joborder.status IN %s
+                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
             AND
                 candidate_joborder_status_history.site_id = %s
             %s",
-            JobOrderStatuses::getStatisticsStatusSQL(),
             $this->_siteID,
             $criterion
         );
@@ -254,7 +252,7 @@ class Statistics
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = joborder.owner
             WHERE
-                joborder.status IN %s
+                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
             AND
                 joborder.site_id = %s
             GROUP BY
@@ -262,7 +260,6 @@ class Statistics
             HAVING
                 submittedCount > 0",
             $criterion,
-            JobOrderStatuses::getStatisticsStatusSQL(),
             $this->_siteID
         );
 
@@ -364,7 +361,7 @@ class Statistics
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = joborder.owner
             WHERE
-                joborder.status IN %s
+                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
             AND
                 joborder.site_id = %s
             GROUP BY
@@ -372,7 +369,6 @@ class Statistics
             HAVING
                 submittedCount > 0",
             $criterion,
-            JobOrderStatuses::getStatisticsStatusSQL(),
             $this->_siteID
         );
 

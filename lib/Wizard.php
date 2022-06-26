@@ -31,7 +31,7 @@
  */
 
 // FIXME: This is globally included...
-include_once(LEGACY_ROOT . '/lib/CATSUtility.php');
+include_once('./lib/CATSUtility.php');
 
 /**
  *	Form Wizard Library
