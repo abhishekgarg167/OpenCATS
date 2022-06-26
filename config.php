@@ -37,10 +37,10 @@ if( !defined('LEGACY_ROOT') )
 }
 
 /* Database configuration. */
-define('DATABASE_USER', 'cats');
-define('DATABASE_PASS', 'password');
+define('DATABASE_USER', 'opencats');
+define('DATABASE_PASS', 'opencats');
 define('DATABASE_HOST', 'localhost');
-define('DATABASE_NAME', 'cats_dev');
+define('DATABASE_NAME', 'opencats');
 
 /* Authentication Configuration
  * Options are sql, ldap, sql+ldap
@@ -177,7 +177,7 @@ define('FORGOT_PASSWORD_BODY',      'You recently requested that your OpenCATS: 
 define('ENABLE_DEMO_MODE', false);
 
 /* Offset to GMT Time. */
-define('OFFSET_GMT', 2);
+define('OFFSET_GMT', 6);
 
 /* Should we enforce only one session per user (excluding demo)? */
 define('ENABLE_SINGLE_SESSION', false);
@@ -350,8 +350,8 @@ class ACL_SETUP {
         'candidate' => array('Candidate', 'candidate', 'This is a candidate.', ACCESS_LEVEL_SA, ACCESS_LEVEL_READ),
         'demo' => array('Demo', 'demo', 'This is a demo user.', ACCESS_LEVEL_SA, ACCESS_LEVEL_READ)
     );
-   
-    // defining access levels different from the default access level    
+
+    // defining access levels different from the default access level
     public static $ACCESS_LEVEL_MAP = array(
         'candidate' => array(
         ),
@@ -367,7 +367,7 @@ class ACL_SETUP {
 };
 */
 
-/* All possible secure object names 
+/* All possible secure object names
             'candidates.history'
             'settings.administration'
             'joborders.editRating'
