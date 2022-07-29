@@ -1,41 +1,30 @@
-# OpenCATS
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/948d67033d624e9382a332af20339c00)](https://www.codacy.com/app/OpenCATS/OpenCATS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=opencats/OpenCATS&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://travis-ci.org/opencats/OpenCATS.png)](https://travis-ci.org/opencats/OpenCATS)
-
 OpenCATS is a Free and Open Source Candidate/Applicant Tracking System designed for Recruiters to manage recruiting process from job posting, candidate application, through to candidate selection and submission.
 
-More details: 
-
-<http://www.opencats.org>
-
-End user/Installation  documentation:
-
-<http://opencats-documentation.readthedocs.io/en/latest/>
-
-OpenCATS YouTube channel:
-
-<https://www.youtube.com/channel/UChJ_YF1w74o8iWFAYa9w0xQ>
-
-Developers Mailing List:
-
-<https://groups.google.com/forum/#!forum/opencats-dev>
-
-Support Forums:
-
-<http://forums.opencats.org>
-
-Installation Procedure:
-
-    Windows: http://opencats-documentation.readthedocs.io/en/latest/install-windows.html
-    Linux: http://opencats-documentation.readthedocs.io/en/latest/
-
-Issues:
-
-[Open Issues](https://github.com/opencats/OpenCATS/issues?q=is%3Aopen)
-
-[![Planed](https://badge.waffle.io/opencats/opencats.svg?label=waffle:%20ready&title=Planed)](http://waffle.io/opencats/opencats)
-[![In Progress](https://badge.waffle.io/opencats/opencats.svg?label=waffle:%20in%20progress&title=In%20Progress)](http://waffle.io/opencats/opencats)
-[![Ready To Test](https://badge.waffle.io/opencats/opencats.svg?label=waffle:%20ready%20to%20test&title=Ready%20To%20Test)](http://waffle.io/opencats/opencats)
+I have enabled a new role in the opencats application who can manage only the candidate profiles. In this the new role will have only limited access to the components. For ex. it can access the candidates components like adding candidates, searching candidates but cannot access the job orders.
+To implement this - 
+Insert a new user using sql query in the database. In the category column give it a name (say recruiter).
+In config.php I had created a category according to our requirement that we will give to the guest user in the database.
+Code of that category - 
+'recruiter' => array(
+        'candidates' => ACCESS_LEVEL_DELETE,
+        'joborders' => ACCESS_LEVEL_DISABLED,
+        'companies' => ACCESS_LEVEL_DISABLED,
+        'calendar' => ACCESS_LEVEL_DISABLED,
+        'reports' => ACCESS_LEVEL_DISABLED,
+        'contacts' => ACCESS_LEVEL_DISABLED,
+        'lists' => ACCESS_LEVEL_DISABLED,
+        'settings' => ACCESS_LEVEL_DISABLED,
+),
 
 
-[![Throughput Graph](https://graphs.waffle.io/opencats/opencats/throughput.svg)](https://waffle.io/opencats/opencats/metrics/throughput)
+Another task done is - 
+It was not able to read the resumes in pdf format, so it contains solving the bug of parsing files in pdf format.
+In php.ini file I have declared class COM
+Changes done in php.ini file -
+[PHP_COM_DOTNET]
+extension=php_com_dotnet.dll
+[COM]
+com.typelib_file = php_com_dotnet.dll
+com.allow_dcom = true
+com.autoregister_typelib = true
+For parsing of the pdf file I have downloaded the pdftotext.exe file and the next task was to set its path in the config.php file.
